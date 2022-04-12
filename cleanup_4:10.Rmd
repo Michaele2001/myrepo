@@ -1,0 +1,61 @@
+---
+title: "Chaparral Seedling Drought"
+author: "Michaele Dietzel"
+date: "4/10/2022"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#load packages
+library(tidyverse)                      
+library(here)
+library(janitor)
+library(readxl)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+#read in 3/23 soil moisture data, clean
+soil_moisture <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/soil_moisture.csv")
+soil_moisture_3_23 <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/03-23 Soil Moisture Data.csv") %>% 
+  clean_names() %>% 
+  select(moisture, note) %>% 
+  rename(soil_moisture = moisture)
+#read in sto atal conductance data
+read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/midday_stomtal_conductance.csv")
+#read in 3/31 soil moisture data, clean
+soil_moisture_3_31 <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/03-31-soil-moisture.csv") %>% 
+  clean_names() %>% 
+  select(moisture, note) %>% 
+  rename(soil_moisture = moisture) %>% 
+  slice(1:89)
+#read in fluorescence data
+fluorescence <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/flourescence_water_potentials.csv")
+#read in stomatal conductance data
+midday_stomatal_conductance <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/midday_stomtal_conductance.csv")
+leaf_conductance <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/leaf_conductance.csv")
+hourly_conductance <- read.csv("~/Desktop/RProjects/chapparal_seedling_drought/data/hourly_stomatal_conductance.csv")
+```
+
+
+```{r}
+#seperate columns
+soil_moisture_3_23_cleaned <- soil_moisture_3_23 %>% separate(note, c('species', 'id')) %>% 
+  select(soil_moisture, species, id) %>% 
+  mutate(treatment = case_when(
+    (soil_moisture>32) ~ "wet",
+    (soil_moisture<32) ~ "drought"))
+soil_moisture_3_31_cleaned <- soil_moisture_3_31 %>% separate(note, c('species', 'id', 'treatment'))
+```
+
+```{r}
+#add new columns 3/23 
+date <- c("3/23/2022")
+soil_moisture_3_23_cleaned$date <- date
+#add new columns 3/31
+date <- c("3/31/2022")
+soil_moisture_3_31_cleaned$date <- date
+```
+
